@@ -7,15 +7,15 @@ let y = Math.floor(WIDTH * 0.95);
 let dx = 0;
 let dy = 0;
 
-let defaultMaxSpeed = Math.floor(WIDTH * 0.0075);
+let defaultMaxSpeed = WIDTH * 0.003;
 let braking = false;
 
 let accel = 0.3;
 let maxSpeed = defaultMaxSpeed;
 let fric = 0.95;
 
-let maxSpeedBraking = Math.floor(WIDTH * 0.0025);
-let brakeSpeed = Math.floor(WIDTH * 0.000125);
+let maxSpeedBraking = defaultMaxSpeed / 2;
+let brakeSpeed = 0.15;
 
 let mousex = 0;
 
@@ -103,6 +103,13 @@ function draw() {
 
 	x += dx;
 	y += dy;
+
+	let traceColor = color("red");
+	traceColor.setAlpha(128);
+
+	stroke(traceColor);
+	strokeWeight(5);
+	line(x, y, mouseX, mouseY);
 
 	// Draw the moving point
 	stroke("#000000");
