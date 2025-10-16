@@ -97,6 +97,7 @@ class Car {
 		this.pos = createVector(x, y);
 		this.vel = createVector(0, 0);
 		this.braking = false;
+		this.gotCurrentPos = false;
 		this.maxSpeed = CONFIG.car.maxSpeed;
 	}
 
@@ -106,6 +107,7 @@ class Car {
 		this.moveTowards(targetX, targetY);
 		this.limitSpeed();
 		this.pos.add(this.vel);
+		this.particles();
 	}
 
 	updateMaxSpeed() {
@@ -163,6 +165,18 @@ class Car {
 			// Only if you want braking to come from wall or manual input
 			if (!mouseIsPressed) this.setBraking(false);
 		}
+	}
+
+	particles() {
+		let particles = [];
+		for (const element of particles) {
+			stroke("#000000");
+			strokeWeight(20);
+			point(element[0], element[1]);
+		}
+		setInterval(() => {
+			particles.push([this.pos.x, this.pos.y]);
+		}, 1000);
 	}
 
 
