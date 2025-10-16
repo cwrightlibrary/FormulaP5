@@ -97,7 +97,6 @@ class Car {
 		this.pos = createVector(x, y);
 		this.vel = createVector(0, 0);
 		this.braking = false;
-		this.gotCurrentPos = false;
 		this.maxSpeed = CONFIG.car.maxSpeed;
 	}
 
@@ -107,7 +106,6 @@ class Car {
 		this.moveTowards(targetX, targetY);
 		this.limitSpeed();
 		this.pos.add(this.vel);
-		this.particles();
 	}
 
 	updateMaxSpeed() {
@@ -167,18 +165,6 @@ class Car {
 		}
 	}
 
-	particles() {
-		let particles = [];
-		for (const element of particles) {
-			stroke("#000000");
-			strokeWeight(20);
-			point(element[0], element[1]);
-		}
-		setInterval(() => {
-			particles.push([this.pos.x, this.pos.y]);
-		}, 1000);
-	}
-
 
 	draw(targetX, targetY) {
 		const toTarget = createVector(targetX - this.pos.x, targetY - this.pos.y);
@@ -231,6 +217,90 @@ class Car {
 	}
 }
 
+class Particles {
+	constructor(car) {
+		this.effects = [];
+		this.trailColors = [
+			color("#9fc9ff"),
+			color("#6a88af"),
+			color("#364a63")
+		];
+		this.trailAmount = 2;
+		this.trailWidth = 20;
+	}
+
+	addFX(x, y, life, dx, dy, grav, r, cTable) {
+		const fx = {
+			x, y,
+			t: 0,
+			die: life,
+			dx, dy,
+			grav,
+			r,
+			baseR: r,
+			cTable,
+			c: cTable[0],
+			alpha: 255
+		};
+		this.effects.push(fx);
+	}
+
+	updateFX() {
+		// filter out finished particles
+		this.effects = this.effects.filter(fx => fx.t < fx.die);
+
+		for (const fx of this.effects) {
+			fx.t++;
+
+			// progress ratio (0 → 1)
+			const progress = fx.t / fx.die;
+
+			// smoothly fade out (alpha 255 → 0)
+			fx.alpha = 255 * (1 - progress);
+
+			// grow slightly over time
+			fx.r = fx.baseR + progress * 4;
+
+			// pick color based on progress
+			const colorIndex = floor(map(progress, 0, 1, 0, fx.cTable.length - 1));
+			fx.c = fx.cTable[colorIndex];
+
+			// apply gravity and velocity
+			if (fx.grav) fx.dy += 0.05;
+			fx.x += fx.dx;
+			fx.y += fx.dy;
+		}
+	}
+
+	drawFX() {
+		noFill();
+		for (const fx of this.effects) {
+			const c = color(fx.c);
+			c.setAlpha(fx.alpha);
+			stroke(c);
+			strokeWeight(fx.r);
+			point(fx.x, fx.y);
+		}
+	}
+
+	trail(x, y, w, cTable, num) {
+		for (let i = 0; i < num; i++) {
+			this.addFX(
+				x + random(-w / 2, w / 2),
+				y + random(-w / 2, w / 2),
+				10 + random(7.5),          // lifetime
+				random(-0.2, 0.2),        // dx
+				random(-0.2, 0.2),        // dy
+				false,                    // gravity
+				5,                        // radius
+				cTable
+			);
+		}
+	}
+}
+
+
+
 class DebugUI {
 	static draw(car) {
 		noStroke();
@@ -244,6 +314,7 @@ class DebugUI {
 // Game state
 let track;
 let car;
+let particles;
 
 function setup() {
 	createCanvas(CONFIG.width, CONFIG.height);
@@ -263,6 +334,7 @@ function setup() {
 
 	track = new Track(points);
 	car = new Car(CONFIG.width * 0.5, CONFIG.width * 0.95);
+	particles = new Particles(car);
 }
 
 function draw() {
@@ -273,10 +345,18 @@ function draw() {
 
 	car.update(mouseX, mouseY);
 	car.constrainToTrack(track);
+
+	// add new trail particles every frame based on car position
+	particles.trail(car.pos.x, car.pos.y, particles.trailWidth, particles.trailColors, particles.trailAmount);
+
+	particles.updateFX();
+	particles.drawFX();
+
 	car.draw(mouseX, mouseY);
 
 	DebugUI.draw(car);
 }
+
 
 function mousePressed() {
 	car.setBraking(true);
