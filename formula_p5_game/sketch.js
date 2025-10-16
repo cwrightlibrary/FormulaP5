@@ -2,9 +2,9 @@ const CONFIG = {
 	width: 800,
 	height: 800,
 	track: {
-		outerWidth: 60,
-		innerWidth: 50,
-		halfWidth: 25,
+		outerWidth: 100,
+		innerWidth: 85,
+		halfWidth: 42.5,
 		outerColor: "#ffffff",
 		innerColor: "#999999"
 	},
@@ -235,18 +235,16 @@ function setup() {
 	createCanvas(CONFIG.width, CONFIG.height);
 
 	const points = [
-		createVector(CONFIG.width * 0.5, CONFIG.width * 0.95),
-		createVector(CONFIG.width * 0.95, CONFIG.width * 0.35),
-		createVector(CONFIG.width * 0.85, CONFIG.width * 0.25),
+		createVector(CONFIG.width * 0.5, CONFIG.width * 0.75),
+		createVector(CONFIG.width * 0.9, CONFIG.width * 0.35),
 		createVector(CONFIG.width * 0.5, CONFIG.width * 0.45),
 		createVector(CONFIG.width * 0.35, CONFIG.width * 0.525),
-		createVector(CONFIG.width * 0.15, CONFIG.width * 0.45),
-		createVector(CONFIG.width * 0.45, 110),
+		createVector(CONFIG.width * 0.45, CONFIG.width * 0.275),
 		createVector(CONFIG.width * 0.5, CONFIG.width * 0.05),
 		createVector(CONFIG.width * 0.05, CONFIG.width * 0.45),
-		createVector(CONFIG.width * 0.5, CONFIG.width * 0.95),
-		createVector(CONFIG.width * 0.95, CONFIG.width * 0.35),
-		createVector(CONFIG.width * 0.85, CONFIG.width * 0.25)
+		createVector(CONFIG.width * 0.5, CONFIG.width * 0.9),
+		createVector(CONFIG.width * 0.9, CONFIG.width * 0.35),
+		createVector(CONFIG.width * 0.9, CONFIG.width * 0.25)
 	];
 
 	track = new Track(points);
